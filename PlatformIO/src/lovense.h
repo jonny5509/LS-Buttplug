@@ -6,6 +6,7 @@
 #include "LS.h"
 #include <string>
 #include <esp_system.h>
+#include <esp_mac.h>
 
 // ---------------- Device definitions ----------------
 #define DEVICE_NAME     "LVS-Lush11"
