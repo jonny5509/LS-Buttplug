@@ -16,6 +16,12 @@
 // ---------------- BLE Service functions ----------------
 inline void bluetooth_service_init() {
     NimBLEDevice::init(DEVICE_NAME);
+
+    // Require bonded, encrypted BLE connections. This device has no
+    // display or keypad, so pairing uses Just Works (no MITM protection).
+    NimBLEDevice::setSecurityAuth(true, false, true);
+    NimBLEDevice::setSecurityIOCap(BLE_HS_IO_NO_INPUT_OUTPUT);
+
     NimBLEAdvertising *pAdvertising = NimBLEDevice::getAdvertising();
     pAdvertising->enableScanResponse(true);
     pAdvertising->setMinInterval(0x12);
@@ -120,10 +126,22 @@ inline std::string set_vibration_speed(const std::string& command) {
 
 // ---------------- Lovense init ----------------
 inline void lovense_init() {
+    // main.cpp initializes NimBLEDevice before calling lovense_init().
+    // Set security here as well so this service always enforces it.
+    NimBLEDevice::setSecurityAuth(true, false, true);
+    NimBLEDevice::setSecurityIOCap(BLE_HS_IO_NO_INPUT_OUTPUT);
+
     server = NimBLEDevice::createServer();
     server->setCallbacks(new MyServerCallbacks());
     service = server->createService(DEVICE_SERVICE);
-    blecRX = service->createCharacteristic(DEVICE_CHAR_RX, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+
+    // Reject writes unless the BLE link is encrypted.
+    blecRX = service->createCharacteristic(
+        DEVICE_CHAR_RX,
+        NIMBLE_PROPERTY::WRITE |
+        NIMBLE_PROPERTY::WRITE_NR |
+        NIMBLE_PROPERTY::WRITE_ENC
+    );
     blecTX = service->createCharacteristic(DEVICE_CHAR_TX, NIMBLE_PROPERTY::NOTIFY);
     blecRX->setCallbacks(new MyCharacteristicCallbacks());
     service->start();
