@@ -18,7 +18,7 @@ void setup() {
         Serial.println("NVS needs recovery; erasing NVS partition.");
         esp_err_t eraseStatus = nvs_flash_erase();
         if (eraseStatus != ESP_OK) {
-            Serial.printf("NVS erase failed: %s\\n", esp_err_to_name(eraseStatus));
+            Serial.printf("NVS erase failed: %s\n", esp_err_to_name(eraseStatus));
             while (true) delay(1000);
         }
 
@@ -26,7 +26,7 @@ void setup() {
     }
 
     if (nvsStatus != ESP_OK) {
-        Serial.printf("NVS initialization failed: %s\\n", esp_err_to_name(nvsStatus));
+        Serial.printf("NVS initialization failed: %s\n", esp_err_to_name(nvsStatus));
         while (true) delay(1000);
     }
 
@@ -43,7 +43,7 @@ void setup() {
 
 void loop() {
     if (Serial.available()) {
-        String line = Serial.readStringUntil('\\n');
+        String line = Serial.readStringUntil('\n');
         line.trim();
 
         if (line.length() > 0) {
